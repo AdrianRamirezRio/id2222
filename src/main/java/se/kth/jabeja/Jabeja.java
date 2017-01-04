@@ -1,6 +1,7 @@
 package se.kth.jabeja;
 
 import org.apache.log4j.Logger;
+
 import se.kth.jabeja.config.Config;
 import se.kth.jabeja.config.NodeSelectionPolicy;
 import se.kth.jabeja.io.FileIO;
@@ -23,7 +24,7 @@ public class Jabeja {
   //-------------------------------------------------------------------
   public Jabeja(HashMap<Integer, Node> graph, Config config) {
     this.entireGraph = graph;
-    this.nodeIds = new ArrayList(entireGraph.keySet());
+    this.nodeIds = new ArrayList<Integer>(entireGraph.keySet());
     this.round = 0;
     this.numberOfSwaps = 0;
     this.config = config;
@@ -57,7 +58,7 @@ public class Jabeja {
   }
 
   /**
-   * Sample and swap algorith at node p
+   * Sample and swap algorithm at node p
    * @param nodeId
    */
   private void sampleAndSwap(int nodeId) {
@@ -66,41 +67,69 @@ public class Jabeja {
 
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.LOCAL) {
-      // swap with random neighbors
-      // TODO
+      // swap with a neighbor selected from neighbors random sample
+      partner = findPartner(nodeId, getNeighbors(nodep));
     }
 
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM) {
       // if local policy fails then randomly sample the entire graph
-      // TODO
+      if (partner == null) {
+    	  partner = findPartner(nodeId, getSample(nodeId));
+      }
     }
 
-    // swap the colors
-    // TODO
+    // swap the colors (only if a partner has been found)
+    if (partner != null) {
+    	int swap = nodep.getColor();
+    	nodep.setColor(partner.getColor());
+    	partner.setColor(swap);
+    	this.numberOfSwaps++;
+    }
   }
 
+  /**
+   * Get the best partner to exchange with amongst a list of candidates (ids).
+   * @param nodeId The id of the node looking for a partner.
+   * @param nodes The ids of the candidate nodes.
+   * @return The best partner found; null if none found.
+   */
   public Node findPartner(int nodeId, Integer[] nodes){
-
     Node nodep = entireGraph.get(nodeId);
 
     Node bestPartner = null;
     double highestBenefit = 0;
 
-    // TODO
+    double alpha = config.getAlpha();
+    for (Integer candidateId: nodes) {
+    	Node nodeq = entireGraph.get(candidateId);
+    	
+    	int dpp = getDegree(nodep, nodep.getColor());
+    	int dqq = getDegree(nodeq, nodeq.getColor());
+    	double old = Math.pow(dpp, alpha) + Math.pow(dqq, alpha);
+    	
+    	int dpq = getDegree(nodep, nodeq.getColor());
+    	int dqp = getDegree(nodeq, nodep.getColor());
+    	double new_ = Math.pow(dpq, alpha) + Math.pow(dqp, alpha);
+    	
+    	if ((new_*T > old) && (new_ > highestBenefit)) {
+    		bestPartner = entireGraph.get(candidateId);
+    		highestBenefit = new_;
+    	}
+    }
 
     return bestPartner;
-  }
+  } 
 
   /**
-   * The the degreee on the node based on color
+   * The degree of the node based on some color
    * @param node
    * @param colorId
    * @return how many neighbors of the node have color == colorId
    */
   private int getDegree(Node node, int colorId){
     int degree = 0;
-    for(int neighborId : node.getNeighbours()){
+    for(int neighborId: node.getNeighbours()){
       Node neighbor = entireGraph.get(neighborId);
       if(neighbor.getColor() == colorId){
         degree++;
@@ -179,7 +208,6 @@ public class Jabeja {
   private void report() throws IOException {
     int grayLinks = 0;
     int migrations = 0; // number of nodes that have changed the initial color
-    int size = entireGraph.size();
 
     for (int i : entireGraph.keySet()) {
       Node node = entireGraph.get(i);
