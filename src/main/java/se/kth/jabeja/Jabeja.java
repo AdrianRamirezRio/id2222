@@ -125,7 +125,7 @@ public class Jabeja {
     	// based on benefit instead of cost (change sign: new - old)
     	double ap = Math.pow(Math.E, (newBenefit - highestBenefit)/T);
     	
-    	if ((ap > Math.random()) && (T > Tmin)) {
+    	if ((ap > Math.random()) && (T > Tmin || newBenefit > highestBenefit)) {
     		bestPartner = entireGraph.get(candidateId);
     		highestBenefit = newBenefit;
     	}
