@@ -19,6 +19,7 @@ public class Jabeja {
   private int numberOfSwaps;
   private int round;
   private float T;
+  private float Tmin;
   private boolean resultFileCreated = false;
 
   //-------------------------------------------------------------------
@@ -29,6 +30,7 @@ public class Jabeja {
     this.numberOfSwaps = 0;
     this.config = config;
     this.T = config.getTemperature();
+    this.Tmin = config.getTemperatureMin();
   }
 
 
@@ -47,14 +49,13 @@ public class Jabeja {
   }
 
   /**
-   * Simulated analealing cooling function
+   * Simulated annealing cooling function
    */
   private void saCoolDown(){
-    // TODO for second task
-    if (T > 1)
-      T -= config.getDelta();
-    if (T < 1)
-      T = 1;
+	  if (T > 1) {
+		  throw new IllegalArgumentException("Initial temperature must be maximum 1.");
+	  }
+      T *= config.getDelta();
   }
 
   /**
@@ -116,9 +117,17 @@ public class Jabeja {
     	int dqp = getDegree(nodeq, nodep.getColor());
     	double new_ = Math.pow(dpq, alpha) + Math.pow(dqp, alpha);
     	
-    	if ((new_*T > old) && (new_ > highestBenefit)) {
+    	// Instead of cost use benefit as the difference between
+    	// new and old state
+    	double newBenefit = new_ - old;
+    	
+    	// Apply acceptance probability to simulated annealing
+    	// based on benefit instead of cost (change sign: new - old)
+    	double ap = Math.pow(Math.E, (newBenefit - highestBenefit)/T);
+    	
+    	if ((ap > Math.random()) && (T > Tmin)) {
     		bestPartner = entireGraph.get(candidateId);
-    		highestBenefit = new_;
+    		highestBenefit = newBenefit;
     	}
     }
 

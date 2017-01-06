@@ -5,6 +5,7 @@ public class Config {
   private Integer rounds;
   private Integer randomNeighborsSampleSize;
   private Float temperature;
+  private Float temperatureMin;
   private Float delta;
   private Integer seed;
   private Integer uniformRandomSampleSize;
@@ -58,6 +59,11 @@ public class Config {
     this.temperature = temperature;
     return this;
   }
+  
+  public Config setTemperatureMin(Float temperatureMin) {
+	    this.temperatureMin = temperatureMin;
+	    return this;
+	  }
 
   public Config setDelta(Float delta) {
     this.delta = delta;
@@ -101,6 +107,13 @@ public class Config {
     }
     return temperature;
   }
+  
+  public Float getTemperatureMin() {
+	    if (temperatureMin == null) {
+	      throw new NullPointerException("Temperature min is not set");
+	    }
+	    return temperatureMin;
+	  }
 
   public Float getDelta() {
     if (delta == null) {
