@@ -13,7 +13,7 @@ set style line 4 lc rgb "green" lw 1.5
 set style line 5 lc rgb "orange" lw 1.5
 set style line 6 lc rgb "#d73027" lw 1.5
 
-set multiplot layout 3,1 title filename  font ",14"
+set multiplot layout 4,1 title filename  font ",14"
 set yrange [0:]
 
 set ylabel "Edge Cut" 
@@ -25,6 +25,9 @@ plot filename using 1:3 with l ls 2 title "Swaps"
 set ylabel "Migrations" 
 set xlabel "Rounds" 
 plot filename using 1:4 with l ls 3 title "Migrations"
+set ylabel "T" 
+set xlabel "Rounds" 
+plot filename using 1:5 with l ls 4 title "Temperature"
 
 unset multiplot
 

@@ -84,12 +84,16 @@ public class Jabeja {
     	int swap = nodep.getColor();
     	nodep.setColor(partner.getColor());
     	partner.setColor(swap);
-    	this.numberOfSwaps++;
+    	// Take the initial color as the host of the node to compute swaps
+    	if (nodep.getInitColor() != partner.getInitColor()) {
+    		this.numberOfSwaps++;
+    	}
     }
   }
 
   /**
    * Get the best partner to exchange with amongst a list of candidates (ids).
+   * Locality improvements are not considered.
    * @param nodeId The id of the node looking for a partner.
    * @param nodes The ids of the candidate nodes.
    * @return The best partner found; null if none found.
@@ -234,7 +238,8 @@ public class Jabeja {
     logger.info("round: " + round +
             ", edge cut:" + edgeCut +
             ", swaps: " + numberOfSwaps +
-            ", migrations: " + migrations);
+            ", migrations: " + migrations +
+            ", T: " + T);
 
     saveToFile(edgeCut, migrations);
   }
@@ -266,11 +271,20 @@ public class Jabeja {
       }
       // create folder and result file with header
       String header = "# Migration is number of nodes that have changed color.";
-      header += "\n\nRound" + delimiter + "Edge-Cut" + delimiter + "Swaps" + delimiter + "Migrations" + delimiter + "Skipped" + "\n";
+      header += "\n\nRound" + delimiter +
+    		  	"Edge-Cut" + delimiter +
+    		  	"Swaps" + delimiter +
+    		  	"Migrations" + delimiter +
+    		  	"T" + delimiter +
+    		  	"Skipped" + "\n";
       FileIO.write(header, outputFilePath);
       resultFileCreated = true;
     }
 
-    FileIO.append(round + delimiter + (edgeCuts) + delimiter + numberOfSwaps + delimiter + migrations + "\n", outputFilePath);
+    FileIO.append(round + delimiter +
+    			  edgeCuts + delimiter +
+    			  numberOfSwaps + delimiter +
+    			  migrations + delimiter +
+    			  T + "\n", outputFilePath);
   }
 }
