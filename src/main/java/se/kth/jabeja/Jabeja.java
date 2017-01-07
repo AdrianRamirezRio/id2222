@@ -34,6 +34,8 @@ public class Jabeja {
 
   //-------------------------------------------------------------------
   public void startJabeja() throws IOException {
+    int count = 10;
+    int prevNSwaps = 0;
     for (round = 0; round < config.getRounds(); round++) {
       for (int id : entireGraph.keySet()) {
         sampleAndSwap(id);
@@ -41,6 +43,18 @@ public class Jabeja {
 
       //one cycle for all nodes have completed.
       //reduce the temperature
+      if (this.numberOfSwaps == prevNSwaps) {
+          count--;
+      }
+      else {
+          count = 10;
+      }
+      prevNSwaps = this.numberOfSwaps;
+      if (T == 1 && count == 0) {
+          count = 10;
+          T = config.getTemperature();
+      }
+
       saCoolDown();
       report();
     }
