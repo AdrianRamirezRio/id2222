@@ -43,7 +43,7 @@ public class Jabeja {
 
       //one cycle for all nodes have completed.
       //reduce the temperature
-      saCoolDown();
+      saCoolDown(config.getCoolingMode());
       report();
     }
   }
@@ -51,16 +51,16 @@ public class Jabeja {
   /**
    * Simulated annealing cooling function
    */
-  private void saCoolDown(){
-      T *= config.getDelta();
-	  //T *= Math.pow(config.getDelta(), round/100);
-	  //T = T / (1 + T * round);
-			  
-      /*if (round % 500 == 0) {
-    	  T = config.getTemperature();
-      }*/
-	  
-
+  private void saCoolDown(int mode){
+	  if (mode == 1) {
+		  T *= config.getDelta();
+	  } else if (mode == 2) {
+		  T *= Math.pow(config.getDelta(), round/100);
+	  } else if (mode == 3) {
+		  T = T / (1 + config.getDelta() * round);
+	  } else {
+		  throw new IllegalArgumentException("Cooldown mode not valid.");
+	  }
   }
 
   /**
@@ -130,13 +130,18 @@ public class Jabeja {
     	// based on benefit instead of cost (change sign: new - old)
     	double ap = 0;
     	if (newBenefit > highestBenefit) {
-    		ap = 2;
+    		ap = 1;
     	} else {
-    		//ap = Math.pow(Math.E, (newBenefit - highestBenefit)/T);
-    		ap = Math.pow(highestBenefit/newBenefit, 1/T);
+    		if (config.getAcceptanceProbabilityMode() == 1) {
+    			ap = Math.pow(Math.E, (newBenefit - highestBenefit)/T);
+    		} else if (config.getAcceptanceProbabilityMode() == 2) {
+    			ap = 1 / (1 + Math.pow(Math.E, (highestBenefit - newBenefit)/T));
+    		} else {
+    			throw new IllegalArgumentException("The selected mode for ap is not valid.");
+    		}
     	}
 
-    	if ((ap > RandNoGenerator.random()) && (T > Tmin || ap > 1)) {
+    	if ((ap > RandNoGenerator.random()) && (T > Tmin || newBenefit > highestBenefit)) {
     		bestPartner = entireGraph.get(candidateId);
     		highestBenefit = newBenefit;
     	}
@@ -280,7 +285,9 @@ public class Jabeja {
             "RNSS" + "_" + config.getRandomNeighborSampleSize() + "_" +
             "URSS" + "_" + config.getUniformRandomSampleSize() + "_" +
             "A" + "_" + config.getAlpha() + "_" +
-            "R" + "_" + config.getRounds() + ".txt";
+            "R" + "_" + config.getRounds() + "_" +
+            "COOL" + "_" + config.getCoolingMode() + "_" +
+            "AP" + "_" + config.getAcceptanceProbabilityMode() + ".txt";
 
     if (!resultFileCreated) {
       File outputDir = new File(config.getOutputDir());

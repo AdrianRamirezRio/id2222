@@ -14,6 +14,8 @@ public class Config {
   private GraphInitColorPolicy initColorPolicy;
   private NodeSelectionPolicy nodeSelectionPolicy;
   private Float alpha;
+  private Integer coolingMode;
+  private Integer accProbMode;
 
   public Config setAlpha(Float alpha) {
     this.alpha = alpha;
@@ -79,6 +81,16 @@ public class Config {
     this.uniformRandomSampleSize = rnd_list_size;
     return this;
   }
+  
+  public Config setCoolingMode(Integer mode) {
+	  this.coolingMode = mode;
+	  return this;
+  }
+  
+  public Config setAcceptanceProbabilityMode(Integer ap) {
+	  this.accProbMode = ap;
+	  return this;
+  }
 
   public Integer getNumPartitions() {
     if (numPartitions == null) {
@@ -142,6 +154,20 @@ public class Config {
     }
     return graphFile;
   }
+  
+  public int getCoolingMode() {
+    if (coolingMode == null) {
+        throw new NullPointerException("Cooling mode is not set");
+      }
+    return coolingMode;
+  }
+  
+  public int getAcceptanceProbabilityMode() {
+    if (accProbMode == null) {
+        throw new NullPointerException("Aceptance probability mode is not set");
+      }
+    return accProbMode;
+  }
 
   public GraphInitColorPolicy getGraphInitialColorPolicy() {
     if (initColorPolicy == null) {
@@ -174,5 +200,4 @@ public class Config {
   public Config createJabejaConfig() {
     return new Config();
   }
-
 }
