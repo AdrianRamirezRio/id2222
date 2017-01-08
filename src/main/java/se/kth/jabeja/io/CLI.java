@@ -58,7 +58,7 @@ public class CLI {
   private static String GRAPH = "./graphs/ws-250.graph";
 
   @Option(name = "-outputDir", usage = "Location of the output file(s)")
-  private static String OUTPUT_DIR = "./output/task2";
+  private static String OUTPUT_DIR = "./output/optional";
 
   public Config parseArgs(String[] args) throws FileNotFoundException {
     CmdLineParser parser = new CmdLineParser(this);

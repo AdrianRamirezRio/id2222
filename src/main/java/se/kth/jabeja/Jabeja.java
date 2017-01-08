@@ -52,10 +52,15 @@ public class Jabeja {
    * Simulated annealing cooling function
    */
   private void saCoolDown(){
-	  if (T > 1) {
-		  throw new IllegalArgumentException("Initial temperature must be maximum 1.");
-	  }
       T *= config.getDelta();
+	  //T *= Math.pow(config.getDelta(), round/100);
+	  //T = T / (1 + T * round);
+			  
+      /*if (round % 500 == 0) {
+    	  T = config.getTemperature();
+      }*/
+	  
+
   }
 
   /**
@@ -123,9 +128,15 @@ public class Jabeja {
     	
     	// Apply acceptance probability to simulated annealing
     	// based on benefit instead of cost (change sign: new - old)
-    	double ap = Math.pow(Math.E, (newBenefit - highestBenefit)/T);
-    	
-    	if ((ap > Math.random()) && (T > Tmin || newBenefit > highestBenefit)) {
+    	double ap = 0;
+    	if (newBenefit > highestBenefit) {
+    		ap = 2;
+    	} else {
+    		//ap = Math.pow(Math.E, (newBenefit - highestBenefit)/T);
+    		ap = Math.pow(highestBenefit/newBenefit, 1/T);
+    	}
+
+    	if ((ap > RandNoGenerator.random()) && (T > Tmin || ap > 1)) {
     		bestPartner = entireGraph.get(candidateId);
     		highestBenefit = newBenefit;
     	}

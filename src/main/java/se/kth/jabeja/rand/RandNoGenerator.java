@@ -22,6 +22,10 @@ public class RandNoGenerator {
     public static int nextInt(int number){
         return rand.nextInt(number);
     }
+    
+    public static double random() {
+    	return rand.nextDouble();
+    }
 
 
 }
